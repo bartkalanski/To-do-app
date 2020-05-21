@@ -9,12 +9,10 @@ var todoSchema = new mongoose.Schema({
     item: String
 });
 var Todo = mongoose.model('Todo', todoSchema);
-var itemOne = Todo({item: 'buy flowers'}).save(function(err){
-    if (err) throw err;
-    console.log('item saved');
-})
-//Dummy data 
-var data = [{item: 'get milk'}, {item: 'walk dog'}, {item: 'kick some coding ass'}];
+
+/*Dummy data 
+var data = [{item: 'get milk'}, {item: 'walk dog'}, {item: 'kick some coding ass'}];*/
+
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 //Sets up request handlers
@@ -23,21 +21,28 @@ module.exports = function(app){
 
 //Handles get requests()
 app.get('/todo', function(req, res){
-    res.render('todo', {todos: data});
+    //get data from mongodb and pass it to view
+    Todo.find({}, function(err, data){
+        if (err) throw err;
+        res.render('todo', {todos: data});
+    })
+    
 
 });
 //Handles post requests(when user adds something to the list)
 app.post('/todo', urlencodedParser, function(req, res){
-data.push(req.body);
-res.json(data);
-
+//get data from the view and add it to mongodb
+var newTodo = Todo(req.body).save(function(err,data){
+    if (err) throw err;
+    res.json(data);
+})
 });
 //Handles delete requests(allows user to delete items of the list).
 app.delete('/todo/:item', function(req, res){
-    data = data.filter(function(todo){
-        return todo.item.replace(/ /g, '-') !== req.params.item;
-    });
-    res.json(data);
-
-});
+    //delete the requested item from mongodb
+    Todo.find({item: req.params.item.replace(/\-/g, " ")}).remove(function(err,data){
+        if (err) throw err;
+        res.json(data);
+    })
+ });
 };
