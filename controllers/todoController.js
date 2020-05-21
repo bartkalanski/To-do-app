@@ -3,6 +3,7 @@ module.exports = function(app){
 
 //Handles get requests()
 app.get('/todo', function(req, res){
+    res.render('todo');
 
 });
 //Handles post requests(when user adds something to the list)
