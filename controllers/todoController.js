@@ -1,11 +1,25 @@
 //Loads body parser 
 var bodyParser = require('body-parser');
+//Sets up mongoose
+var mongoose = require('mongoose');
+//Connect to the database Bartek1993%21
+mongoose.connect('mongodb+srv://bkalan011:Bartek1993%21@cluster0-l35of.mongodb.net/test?retryWrites=true&w=majority',{ useNewUrlParser: true });
+//Create a schema
+var todoSchema = new mongoose.Schema({
+    item: String
+});
+var Todo = mongoose.model('Todo', todoSchema);
+var itemOne = Todo({item: 'buy flowers'}).save(function(err){
+    if (err) throw err;
+    console.log('item saved');
+})
 //Dummy data 
 var data = [{item: 'get milk'}, {item: 'walk dog'}, {item: 'kick some coding ass'}];
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 //Sets up request handlers
 module.exports = function(app){
+
 
 //Handles get requests()
 app.get('/todo', function(req, res){
